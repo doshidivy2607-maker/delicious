@@ -474,17 +474,17 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Full Name</label>
-                                <input type="text" placeholder="John Doe" required>
+                                <input type="text" placeholder="Enter Name " required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" placeholder="john@example.com" required>
+                                <input type="email" placeholder="Enter your email address" required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Phone</label>
-                                <input type="tel" placeholder="+91 98765 43210">
+                                <input type="tel" placeholder="+91 98765 *****">
                             </div>
                             <div class="form-group">
                                 <label>Subject</label>
