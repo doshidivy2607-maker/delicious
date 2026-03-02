@@ -453,8 +453,8 @@
                     <div class="contact-card glass-effect">
                         <i class="fas fa-phone"></i>
                         <h4>Call Us</h4>
-                        <p>+91 98765 43210</p>
-                        <p>+91 98765 43211</p>
+                        <p>+91 98765 *****</p>
+                        <p>+91 98765 *****</p>
                     </div>
                     <div class="contact-card glass-effect">
                         <i class="fas fa-envelope"></i>
@@ -465,8 +465,8 @@
                     <div class="contact-card glass-effect">
                         <i class="fas fa-map-marker-alt"></i>
                         <h4>Visit Us</h4>
-                        <p>123 Food Street, Tech Hub</p>
-                        <p>Mumbai - 400001, India</p>
+                        <p>Delicious Dispatchers, Indus University</p>
+                        <p>India</p>
                     </div>
                 </div>
                 <div class="contact-form-container animate-fadeInRight">
