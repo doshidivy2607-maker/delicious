@@ -36,6 +36,11 @@ $user_name = $_SESSION['user_name'];
                 <a href="dashboard.php" class="nav-item active" data-tooltip="Dashboard">
                     <i class="fas fa-home"></i>
                 </a>
+                <?php if ($_SESSION['user_email'] === 'doshidivy2607@gmail.com'): ?>
+                <a href="admin.php" class="nav-item" data-tooltip="Admin Panel">
+                    <i class="fas fa-user-shield"></i>
+                </a>
+                <?php endif; ?>
                 <a href="order.php" class="nav-item" data-tooltip="Orders">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="nav-badge">12</span>
@@ -109,26 +114,6 @@ $user_name = $_SESSION['user_name'];
                             <span class="stat-change positive"><i class="fas fa-arrow-up"></i> 8% from yesterday</span>
                         </div>
                     </div>
-                    <div class="stat-card glass-effect animate-fadeInUp" style="animation-delay: 0.2s;">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-label">Active Subscribers</span>
-                            <span class="stat-value">1,234</span>
-                            <span class="stat-change positive"><i class="fas fa-arrow-up"></i> 23 new today</span>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-effect animate-fadeInUp" style="animation-delay: 0.3s;">
-                        <div class="stat-icon purple">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-label">Deliveries</span>
-                            <span class="stat-value">142</span>
-                            <span class="stat-change">14 pending</span>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Quick Actions -->
@@ -139,25 +124,13 @@ $user_name = $_SESSION['user_name'];
                             <i class="fas fa-plus"></i>
                             <span>New Order</span>
                         </a>
-                        <button class="action-btn">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Add Customer</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-utensils"></i>
-                            <span>Update Menu</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-file-invoice"></i>
-                            <span>Generate Report</span>
-                        </button>
                     </div>
                 </div>
 
-                <!-- Recent Orders -->
+                <!-- Live Orders -->
                 <div class="recent-orders glass-effect animate-fadeInUp">
                     <div class="section-header">
-                        <h3>Recent Orders</h3>
+                        <h3>Live Orders</h3>
                         <a href="order.php" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <table class="orders-table">
@@ -172,45 +145,33 @@ $user_name = $_SESSION['user_name'];
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>#DD001</td>
-                                <td>
-                                    <div class="customer-info">
-                                        <span class="avatar">RS</span>
-                                        <span>Rahul Sharma</span>
-                                    </div>
-                                </td>
-                                <td>Monthly Veg</td>
-                                <td>₹3,500</td>
-                                <td><span class="status delivered">Delivered</span></td>
-                                <td><button class="btn-icon"><i class="fas fa-eye"></i></button></td>
-                            </tr>
-                            <tr>
-                                <td>#DD002</td>
-                                <td>
-                                    <div class="customer-info">
-                                        <span class="avatar">PK</span>
-                                        <span>Priya Kumar</span>
-                                    </div>
-                                </td>
-                                <td>Weekly Non-Veg</td>
-                                <td>₹1,200</td>
-                                <td><span class="status in-transit">In Transit</span></td>
-                                <td><button class="btn-icon"><i class="fas fa-eye"></i></button></td>
-                            </tr>
-                            <tr>
-                                <td>#DD003</td>
-                                <td>
-                                    <div class="customer-info">
-                                        <span class="avatar">AV</span>
-                                        <span>Amit Verma</span>
-                                    </div>
-                                </td>
-                                <td>Daily Lunch</td>
-                                <td>₹150</td>
-                                <td><span class="status pending">Pending</span></td>
-                                <td><button class="btn-icon"><i class="fas fa-eye"></i></button></td>
-                            </tr>
+                            <?php
+                            // Fetch live orders (pending or in-transit)
+                            $stmt = $pdo->prepare("SELECT o.*, u.fullname FROM orders o JOIN users u ON o.user_id = u.id WHERE o.status IN ('Pending', 'In Transit') ORDER BY o.created_at DESC LIMIT 5");
+                            $stmt->execute();
+                            $live_orders = $stmt->fetchAll();
+
+                            if (count($live_orders) > 0) {
+                                foreach ($live_orders as $order) {
+                                    $status_class = strtolower(str_replace(' ', '-', $order['status']));
+                                    echo '<tr>';
+                                    echo '<td>#' . str_pad($order['id'], 3, '0', STR_PAD_LEFT) . '</td>';
+                                    echo '<td>';
+                                    echo '<div class="customer-info">';
+                                    echo '<span class="avatar">' . strtoupper(substr($order['fullname'], 0, 2)) . '</span>';
+                                    echo '<span>' . htmlspecialchars($order['fullname']) . '</span>';
+                                    echo '</div>';
+                                    echo '</td>';
+                                    echo '<td>' . htmlspecialchars($order['plan_name'] ?? 'N/A') . '</td>';
+                                    echo '<td>₹' . number_format($order['amount'] ?? 0) . '</td>';
+                                    echo '<td><span class="status ' . $status_class . '">' . htmlspecialchars($order['status']) . '</span></td>';
+                                    echo '<td><button class="btn-icon"><i class="fas fa-eye"></i></button></td>';
+                                    echo '</tr>';
+                                }
+                            } else {
+                                echo '<tr><td colspan="6" style="text-align: center; color: rgba(255,255,255,0.6);">No live orders at the moment</td></tr>';
+                            }
+                            ?>
                         </tbody>
                     </table>
                 </div>

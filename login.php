@@ -19,7 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['fullname'];
             $_SESSION['user_email'] = $user['email'];
-            header('Location: dashboard.php');
+            // Redirect admin to admin panel
+            if ($user['email'] === 'doshidivy2607@gmail.com') {
+                header('Location: admin.php');
+            } else {
+                header('Location: dashboard.php');
+            }
             exit();
         } else {
             $error = 'Invalid email or password';
