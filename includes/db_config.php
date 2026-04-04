@@ -28,12 +28,42 @@ $pdo->exec($sql);
 // Create orders table if not exists
 $sql = "CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(50) UNIQUE NOT NULL,
     user_id INT NOT NULL,
-    plan_name VARCHAR(100),
-    amount DECIMAL(10, 2),
-    status VARCHAR(50) DEFAULT 'Pending',
+    items JSON,
+    subtotal DECIMAL(10, 2) DEFAULT 0,
+    delivery_fee DECIMAL(10, 2) DEFAULT 0,
+    tax DECIMAL(10, 2) DEFAULT 0,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50) DEFAULT 'razorpay',
+    payment_id VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'pending',
+    delivery_address TEXT,
+    delivery_time VARCHAR(50),
+    order_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+$pdo->exec($sql);
+
+// Create menu table if not exists
+$sql = "CREATE TABLE IF NOT EXISTS menu (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    original_price DECIMAL(10, 2),
+    description TEXT,
+    image VARCHAR(255),
+    rating DECIMAL(3,1) DEFAULT 0,
+    reviews INT DEFAULT 0,
+    calories INT,
+    is_bestseller BOOLEAN DEFAULT FALSE,
+    is_new BOOLEAN DEFAULT FALSE,
+    spice_level INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )";
 $pdo->exec($sql);
 ?>

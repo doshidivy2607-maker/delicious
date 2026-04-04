@@ -7,7 +7,42 @@ document.addEventListener('DOMContentLoaded', function() {
     initFilters();
     initSearch();
     initCartToggle();
+    initImageErrorHandling();
 });
+
+// ===== IMAGE ERROR HANDLING =====
+function initImageErrorHandling() {
+    const images = document.querySelectorAll('.card-image img');
+    images.forEach(img => {
+        img.addEventListener('error', function() {
+            // Hide broken image
+            this.style.display = 'none';
+            // Show fallback icon
+            const fallback = document.createElement('div');
+            fallback.className = 'image-fallback';
+            fallback.innerHTML = '<i class="fas fa-image"></i><span>No Image</span>';
+            this.parentElement.appendChild(fallback);
+        });
+
+        // Check if image is from Google (which often fails due to CORS)
+        if (img.src.includes('google') || img.src.includes('lh3') || img.src.includes('ggpht')) {
+            // Try to load the image with a timeout
+            let imgLoaded = false;
+            img.addEventListener('load', () => { imgLoaded = true; });
+
+            setTimeout(() => {
+                if (!imgLoaded) {
+                    // Image didn't load within 3 seconds, show fallback
+                    img.style.display = 'none';
+                    const fallback = document.createElement('div');
+                    fallback.className = 'image-fallback';
+                    fallback.innerHTML = '<i class="fas fa-image"></i><span>Image Unavailable</span>';
+                    img.parentElement.appendChild(fallback);
+                }
+            }, 3000);
+        }
+    });
+}
 
 // ===== ADD TO CART =====
 function addToCart(id, name, price, image, button) {
@@ -66,7 +101,7 @@ function updateCartUI() {
     
     // Calculate totals
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const deliveryFee = subtotal > 0 ? 30 : 0;
+    const deliveryFee = subtotal > 300 ? 0 : 40; // Free delivery above ₹300
     const tax = Math.round(subtotal * 0.05);
     const total = subtotal + deliveryFee + tax;
     
@@ -540,21 +575,46 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+// ===== CALCULATE TOTAL =====
+function calculateTotal() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryFee = subtotal > 300 ? 0 : 40; // Free delivery above ₹300
+    const tax = subtotal * 0.05; // 5% GST
+    return subtotal + deliveryFee + tax;
+}
+
 // ===== PROCEED TO CHECKOUT =====
 function proceedToCheckout() {
     if (cart.length === 0) {
         showNotification('Your cart is empty!', 'error');
         return;
     }
-    
-    // Check if logged in
-    // In production, this would redirect to checkout page
-    showNotification('Redirecting to checkout...', 'info');
-    
-    setTimeout(() => {
-        // window.location.href = 'checkout.php';
-        alert('Checkout functionality - In production, this would redirect to a secure checkout page with payment integration.');
-    }, 1000);
+
+    // Store cart data and redirect to checkout
+    showNotification('Preparing checkout...', 'info');
+
+    fetch('store_cart_session.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            cart: cart,
+            total: calculateTotal()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = 'checkout.php';
+        } else {
+            showNotification('Error preparing checkout. Please try again.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error preparing checkout. Please try again.', 'error');
+    });
 }
 
 // ===== CLOSE MODAL ON ESCAPE =====

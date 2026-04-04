@@ -890,6 +890,37 @@ section {
     font-weight: 600;
 }
 
+/* ===== STATUS BADGES ===== */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.status-badge.completed {
+    background: var(--success);
+    color: white;
+}
+
+.status-badge.pending {
+    background: var(--warning);
+    color: var(--dark);
+}
+
+.status-badge.cancelled {
+    background: var(--danger);
+    color: white;
+}
+
+.status-badge.processing {
+    background: var(--info);
+    color: white;
+}
+
 .pricing-header h3 {
     font-size: 24px;
     margin-bottom: 5px;
