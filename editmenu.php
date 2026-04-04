@@ -143,15 +143,6 @@ foreach ($menu_items as $item) {
                 <span>Admin</span>
             </div>
             <nav class="sidebar-nav">
-                <a href="users.php" class="nav-item" data-tooltip="User Management">
-                    <i class="fas fa-users-cog"></i>
-                </a>
-                <a href="savedorder.php" class="nav-item" data-tooltip="Orders Management">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-                <a href="editmenu.php" class="nav-item active" data-tooltip="Menu Management">
-                    <i class="fas fa-utensils"></i>
-                </a>
                 <a href="dashboard.php" class="nav-item" data-tooltip="User Dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                 </a>

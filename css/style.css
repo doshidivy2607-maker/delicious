@@ -921,6 +921,16 @@ section {
     color: white;
 }
 
+.status-badge.failed {
+    background: var(--danger);
+    color: white;
+}
+
+.status-badge.done {
+    background: #28a745;
+    color: white;
+}
+
 .pricing-header h3 {
     font-size: 24px;
     margin-bottom: 5px;

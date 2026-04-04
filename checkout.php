@@ -64,12 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
     $payment_id = $_POST['razorpay_payment_id'] ?? null;
     $razorpay_order_id = $_POST['razorpay_order_id'] ?? null;
     $razorpay_signature = $_POST['razorpay_signature'] ?? null;
+    $payment_status = $_POST['payment_status'] ?? 'completed';
 
     $full_address = $address . ', ' . $city . ' - ' . $pincode;
     $delivery_schedule = $delivery_time === 'schedule' ? $scheduled_time : 'ASAP';
 
+    // Determine order status based on payment
+    $order_status = 'completed';
+    if ($payment_method === 'cod') {
+        $order_status = 'pending'; // COD orders start as pending until paid
+    } elseif ($payment_status === 'failed') {
+        $order_status = 'failed'; // Failed Razorpay payments
+    }
+
     // Insert order
-    $stmt = $pdo->prepare("INSERT INTO orders (order_id, user_id, items, subtotal, delivery_fee, tax, total_amount, payment_method, payment_id, status, delivery_address, delivery_time, order_notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, NOW())");
+    $stmt = $pdo->prepare("INSERT INTO orders (order_id, user_id, items, subtotal, delivery_fee, tax, total_amount, payment_method, payment_id, status, delivery_address, delivery_time, order_notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
     $order_success = $stmt->execute([
         $order_id,
         $user_id,
@@ -80,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
         $grand_total,
         $payment_method,
         $payment_id,
+        $order_status,
         $full_address,
         $delivery_schedule,
         $order_notes
@@ -150,13 +160,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
                     <!-- Order Success -->
                     <div class="order-success glass-effect animate-fadeInUp">
                         <div class="success-icon">
-                            <i class="fas fa-check-circle"></i>
+                            <?php if ($order_status === 'completed'): ?>
+                                <i class="fas fa-check-circle"></i>
+                            <?php elseif ($order_status === 'pending'): ?>
+                                <i class="fas fa-clock"></i>
+                            <?php else: ?>
+                                <i class="fas fa-times-circle"></i>
+                            <?php endif; ?>
                         </div>
-                        <h2>Order Placed Successfully!</h2>
-                        <p>Thank you for your order. Your food will be delivered soon.</p>
+                        <?php if ($order_status === 'completed'): ?>
+                            <h2>Order Placed Successfully!</h2>
+                            <p>Thank you for your order. Your food will be delivered soon.</p>
+                        <?php elseif ($order_status === 'pending'): ?>
+                            <h2>Order Placed Successfully!</h2>
+                            <p>Your order has been placed. Please pay cash on delivery when your food arrives.</p>
+                        <?php else: ?>
+                            <h2>Payment Failed</h2>
+                            <p>Your order has been saved but payment was not completed. You can try again or contact support.</p>
+                        <?php endif; ?>
                         <div class="order-details">
                             <p><strong>Order ID:</strong> <?php echo $order_id; ?></p>
                             <p><strong>Total Amount:</strong> ₹<?php echo number_format($grand_total, 2); ?></p>
+                            <p><strong>Status:</strong>
+                                <span class="status-badge <?php echo strtolower($order_status); ?>">
+                                    <?php echo ucfirst($order_status); ?>
+                                </span>
+                            </p>
                         </div>
                         <div class="success-actions">
                             <a href="dashboard.php" class="btn btn-primary">Track Order</a>
@@ -367,10 +396,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
                 email: '<?php echo addslashes($user['email']); ?>',
                 contact: '<?php echo addslashes($user['phone'] ?? ''); ?>'
             },
+            modal: {
+                ondismiss: function() {
+                    // Handle when Razorpay modal is closed without payment
+                    console.log('Payment cancelled by user');
+
+                    // Save order with failed status
+                    saveFailedOrder();
+                }
+            },
             theme: {
                 color: '#ff6b35'
             }
         };
+
+        function saveFailedOrder() {
+            const form = document.getElementById('checkoutForm');
+
+            // Add payment method and status for failed order
+            const paymentMethodInput = document.createElement('input');
+            paymentMethodInput.type = 'hidden';
+            paymentMethodInput.name = 'payment_method';
+            paymentMethodInput.value = 'razorpay';
+            form.appendChild(paymentMethodInput);
+
+            const statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'payment_status';
+            statusInput.value = 'failed';
+            form.appendChild(statusInput);
+
+            // Add place_order flag
+            const placeOrderInput = document.createElement('input');
+            placeOrderInput.type = 'hidden';
+            placeOrderInput.name = 'place_order';
+            placeOrderInput.value = '1';
+            form.appendChild(placeOrderInput);
+
+            form.submit();
+        }
 
         function initiatePayment() {
             const form = document.getElementById('checkoutForm');
