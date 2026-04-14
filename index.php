@@ -10,14 +10,6 @@
                     </span>
                     <h1>Fresh & Healthy <span class="gradient-text">Tiffin Service</span> Management</h1>
                     <p>Delicious Dispatchers is a complete tiffin service management solution that helps you manage orders, deliveries, subscriptions, and payments - all in one powerful platform.</p>
-                    <div class="hero-buttons">
-                        <a href="register.php" class="btn btn-primary btn-lg">
-                            <i class="fas fa-rocket"></i> Get Started Free
-                        </a>
-                        <a href="#demo" class="btn btn-outline btn-lg">
-                            <i class="fas fa-play-circle"></i> Watch Demo
-                        </a>
-                    </div>
                     <div class="hero-stats">
                         <div class="stat-item glass-effect">
                             <span class="stat-number" data-count="5000">0</span>+
@@ -305,7 +297,7 @@
                         <li class="disabled"><i class="fas fa-times"></i> Custom branding</li>
                         <li class="disabled"><i class="fas fa-times"></i> API access</li>
                     </ul>
-                    <a href="register.php" class="btn btn-outline btn-block">Get Started</a>
+                    <a href="#" onclick="subscribeToPlan('starter', document.getElementById('pricingToggle').checked ? 'yearly' : 'monthly')" class="btn btn-outline btn-block">Get Started</a>
                 </div>
                 <div class="pricing-card glass-effect featured animate-fadeInUp" style="animation-delay: 0.1s;">
                     <div class="popular-badge">Most Popular</div>
@@ -328,7 +320,7 @@
                         <li><i class="fas fa-check"></i> Custom branding</li>
                         <li class="disabled"><i class="fas fa-times"></i> API access</li>
                     </ul>
-                    <a href="register.php" class="btn btn-primary btn-block">Get Started</a>
+                    <a href="#" onclick="subscribeToPlan('professional', document.getElementById('pricingToggle').checked ? 'yearly' : 'monthly')" class="btn btn-primary btn-block">Get Started</a>
                 </div>
                 <div class="pricing-card glass-effect animate-fadeInUp" style="animation-delay: 0.2s;">
                     <div class="pricing-header">
@@ -420,26 +412,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta">
-        <div class="container">
-            <div class="cta-content glass-effect animate-fadeIn">
-                <div class="cta-text">
-                    <h2>Ready to Transform Your Tiffin Business?</h2>
-                    <p>Join 500+ tiffin service providers who trust Delicious Dispatchers. Start your 14-day free trial today!</p>
-                </div>
-                <div class="cta-buttons">
-                    <a href="register.php" class="btn btn-primary btn-lg">
-                        <i class="fas fa-rocket"></i> Start Free Trial
-                    </a>
-                    <a href="#contact" class="btn btn-outline-white btn-lg">
-                        <i class="fas fa-phone"></i> Talk to Sales
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Contact Section -->
     <section class="contact" id="contact">
         <div class="container">
@@ -508,5 +480,118 @@
             </div>
         </div>
     </section>
+
+    <script>
+        // Subscription payment functions
+        function subscribeToPlan(planName, planType) {
+            // Check if user is logged in
+            <?php if (!isset($_SESSION['user_id'])): ?>
+                alert('Please login first to subscribe to a plan.');
+                window.location.href = 'login.php';
+                return;
+            <?php endif; ?>
+
+            // Show loading
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            button.disabled = true;
+
+            // Create subscription
+            fetch('subscription.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=create_subscription&plan_name=${planName}&plan_type=${planType}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Open Razorpay checkout
+                    openRazorpayCheckout(data, planName, planType);
+                } else {
+                    alert(data.message || 'Failed to create subscription');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+
+        function openRazorpayCheckout(subscriptionData, planName, planType) {
+            const options = {
+                key: 'rzp_test_SZOTNbBPCFlatb', // Your Razorpay Key ID
+                subscription_id: subscriptionData.subscription_id,
+                name: 'Delicious Dispatchers',
+                description: `${subscriptionData.plan_name} Subscription`,
+                amount: subscriptionData.amount,
+                currency: 'INR',
+                handler: function (response) {
+                    // Handle successful payment
+                    verifyPayment(response, planName, planType);
+                },
+                prefill: {
+                    name: '<?php echo isset($_SESSION["user_name"]) ? $_SESSION["user_name"] : ""; ?>',
+                    email: '<?php echo isset($_SESSION["user_email"]) ? $_SESSION["user_email"] : ""; ?>',
+                },
+                theme: {
+                    color: '#ff6b35'
+                },
+                modal: {
+                    ondismiss: function() {
+                        // Reset button when modal is dismissed
+                        const buttons = document.querySelectorAll('.pricing-card a');
+                        buttons.forEach(btn => {
+                            if (btn.innerHTML.includes('Processing')) {
+                                btn.innerHTML = btn.dataset.originalText || 'Get Started';
+                                btn.disabled = false;
+                            }
+                        });
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        function verifyPayment(response, planName, planType) {
+            // Verify payment with server
+            fetch('subscription.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=verify_payment&razorpay_payment_id=${response.razorpay_payment_id}&razorpay_subscription_id=${response.razorpay_subscription_id}&razorpay_signature=${response.razorpay_signature}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Subscription activated successfully! Welcome to Delicious Dispatchers.');
+                    window.location.href = 'dashboard.php';
+                } else {
+                    alert(data.message || 'Payment verification failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during verification. Please contact support.');
+            });
+        }
+
+        // Store original button text
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.pricing-card a');
+            buttons.forEach(btn => {
+                btn.dataset.originalText = btn.innerHTML;
+            });
+        });
+    </script>
 
 <?php include 'includes/footer.php'; ?>
