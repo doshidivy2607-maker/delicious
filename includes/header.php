@@ -42,7 +42,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#how-it-works" class="nav-link">How It Works</a>
                 <a href="#pricing" class="nav-link">Pricing</a>
-                <a href="#testimonials" class="nav-link">Testimonials</a>
+                <a href="rate_review.php" class="nav-link">Rate & Review</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </nav>
             <div class="auth-buttons">

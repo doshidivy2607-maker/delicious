@@ -66,4 +66,18 @@ $sql = "CREATE TABLE IF NOT EXISTS menu (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )";
 $pdo->exec($sql);
+
+// Create reviews table if not exists
+$sql = "CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    menu_id INT NOT NULL,
+    user_id INT NULL,
+    reviewer_name VARCHAR(100) DEFAULT 'Guest',
+    rating DECIMAL(3,1) NOT NULL,
+    review_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (menu_id) REFERENCES menu(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+)";
+$pdo->exec($sql);
 ?>

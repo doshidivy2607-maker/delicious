@@ -59,15 +59,6 @@ $total_spent = $order_stats['total_spent'];
                 <a href="order.php" class="nav-item" data-tooltip="Order Page">
                     <i class="fas fa-utensils"></i>
                 </a>
-                <a href="#" class="nav-item" data-tooltip="Deliveries">
-                    <i class="fas fa-truck"></i>
-                </a>
-                <a href="#" class="nav-item" data-tooltip="Reports">
-                    <i class="fas fa-chart-bar"></i>
-                </a>
-                <a href="#" class="nav-item" data-tooltip="Settings">
-                    <i class="fas fa-cog"></i>
-                </a>
             </nav>
         </aside>
 

@@ -178,7 +178,7 @@ function formatOrderItems($items_json) {
                         <i class="fas fa-utensils"></i>
                         <span>Manage Menu</span>
                     </a>
-                    <button class="action-btn">
+                    <button type="button" id="exportOrdersBtn" class="action-btn">
                         <i class="fas fa-file-export"></i>
                         <span>Export Orders</span>
                     </button>
@@ -191,7 +191,8 @@ function formatOrderItems($items_json) {
                     <h3>All Orders</h3>
                     <span class="user-count">Total Orders: <?php echo count($orders); ?> | Revenue Orders: <?php echo $revenue_order_count; ?> | Revenue: ₹<?php echo number_format($total_revenue); ?></span>
                 </div>
-                <table class="orders-table">
+                <div id="ordersTableContainer">
+                    <table class="orders-table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
@@ -235,6 +236,7 @@ function formatOrderItems($items_json) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </main>
     </div>
@@ -305,11 +307,76 @@ function formatOrderItems($items_json) {
         }
     </style>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        // Context menu functionality
-        let currentOrderId = null;
-
+        // Export orders PDF
         document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.getElementById('exportOrdersBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', async function() {
+                    const source = document.getElementById('ordersTableContainer');
+                    if (!source) return;
+
+                    const jsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : null;
+                    if (!jsPDF) {
+                        alert('PDF export is currently unavailable.');
+                        return;
+                    }
+
+                    try {
+                        const canvas = await html2canvas(source, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: '#ffffff',
+                            logging: false
+                        });
+
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF('p', 'pt', 'a4');
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        const imgProps = pdf.getImageProperties(imgData);
+                        const pdfWidth = pageWidth - 30;
+                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                        let position = 15;
+
+                        if (pdfHeight <= pageHeight - 30) {
+                            pdf.addImage(imgData, 'PNG', 15, position, pdfWidth, pdfHeight);
+                        } else {
+                            let heightLeft = pdfHeight;
+                            let srcHeight = canvas.height;
+                            const ratio = imgProps.width / pdfWidth;
+                            const pageCanvas = document.createElement('canvas');
+                            const pageContext = pageCanvas.getContext('2d');
+                            pageCanvas.width = canvas.width;
+                            pageCanvas.height = Math.floor((pageHeight - 30) * ratio);
+
+                            let yOffset = 0;
+                            while (heightLeft > 0) {
+                                pageContext.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+                                pageContext.drawImage(canvas, 0, yOffset, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
+                                const pageData = pageCanvas.toDataURL('image/png');
+                                pdf.addImage(pageData, 'PNG', 15, 15, pdfWidth, (pageCanvas.height / ratio));
+                                heightLeft -= (pageHeight - 30);
+                                yOffset += pageCanvas.height;
+                                if (heightLeft > 0) {
+                                    pdf.addPage();
+                                }
+                            }
+                        }
+
+                        const filename = 'orders-export-' + new Date().toISOString().slice(0,10) + '.pdf';
+                        pdf.save(filename);
+                    } catch (error) {
+                        console.error('PDF export error:', error);
+                        alert('Unable to export orders to PDF. Please try again.');
+                    }
+                });
+            }
+
+            // Context menu functionality
+            let currentOrderId = null;
             const contextMenu = document.getElementById('contextMenu');
             const orderActions = document.querySelectorAll('.order-actions');
 

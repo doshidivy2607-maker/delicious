@@ -348,66 +348,17 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials" id="testimonials">
+    <!-- Rate & Review CTA -->
+    <section class="cta-review" id="rate-review">
         <div class="container">
             <div class="section-header animate-fadeIn">
-                <span class="section-badge">Testimonials</span>
-                <h2>What Our <span class="gradient-text">Customers Say</span></h2>
-                <p>Trusted by hundreds of tiffin service providers across India</p>
+                <span class="section-badge">Rate & Review</span>
+                <h2>Share Your Food Experience</h2>
+                <p>Customers can now rate dishes and leave feedback directly for every meal.</p>
             </div>
-            <div class="testimonials-slider">
-                <div class="testimonial-card glass-effect animate-fadeInUp">
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonial-text">"Delicious Dispatchers transformed our tiffin business. The order management system is incredibly intuitive, and our delivery efficiency has improved by 40%!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">RS</div>
-                        <div class="author-info">
-                            <strong>Ramesh Sharma</strong>
-                            <span>Ghar Ka Khana Tiffins, Mumbai</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card glass-effect animate-fadeInUp" style="animation-delay: 0.1s;">
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonial-text">"The best investment for our tiffin service. Customer portal feature helped us reduce support calls by 60%. Highly recommended for all tiffin businesses!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">PK</div>
-                        <div class="author-info">
-                            <strong>Priya Kulkarni</strong>
-                            <span>Mom's Kitchen, Pune</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card glass-effect animate-fadeInUp" style="animation-delay: 0.2s;">
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <p class="testimonial-text">"From 50 daily orders to 500+ orders - Delicious Dispatchers scaled with us seamlessly. The analytics dashboard gives us insights we never had before."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">AV</div>
-                        <div class="author-info">
-                            <strong>Amit Verma</strong>
-                            <span>Fresh Bites Tiffin, Delhi</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="review-callout glass-effect animate-fadeInUp">
+                <p>Want your customers to tell you exactly what they loved? Give them a dedicated page to rate food items and submit reviews.</p>
+                <a href="rate_review.php" class="btn btn-primary">Go to Rate & Review</a>
             </div>
         </div>
     </section>
