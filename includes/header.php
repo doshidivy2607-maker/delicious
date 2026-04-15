@@ -38,16 +38,16 @@ if (session_status() == PHP_SESSION_NONE) {
                 <span class="logo-text">Delicious<span class="highlight">Dispatchers</span></span>
             </div>
             <nav class="nav-menu" id="navMenu">
-                <a href="index.php" class="nav-link active">Home</a>
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#how-it-works" class="nav-link">How It Works</a>
-                <a href="#pricing" class="nav-link">Pricing</a>
-                <a href="rate_review.php" class="nav-link">Rate & Review</a>
-                <a href="#contact" class="nav-link">Contact</a>
+                <a href="index.php#home" class="nav-link active">Home</a>
+                <a href="index.php#features" class="nav-link">Features</a>
+                <a href="index.php#how-it-works" class="nav-link">How It Works</a>
+                <a href="index.php#pricing" class="nav-link">Pricing</a>
+                <a href="index.php#rate-review" class="nav-link">Rate & Review</a>
+                <a href="index.php#contact" class="nav-link">Contact</a>
             </nav>
             <div class="auth-buttons">
                 <?php if(isset($_SESSION['user_id'])): ?>
-                    <a href="dashboard.php" class="btn btn-outline">Dashboard</a>
+                    <a href="user-dashboard.php" class="btn btn-outline">Dashboard</a>
                     <a href="logout.php" class="btn btn-primary">Logout</a>
                 <?php else: ?>
                     <a href="login.php" class="btn btn-outline">Login</a>

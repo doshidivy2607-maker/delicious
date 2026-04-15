@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($user['email'] === 'doshidivy2607@gmail.com') {
                 header('Location: admin.php');
             } else {
-                header('Location: dashboard.php');
+                header('Location: user-dashboard.php');
             }
             exit();
         } else {

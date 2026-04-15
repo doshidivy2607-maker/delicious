@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['cart_data'])) {
     $total_amount = $_SESSION['checkout_total'] ?? 0;
 } else {
     // Redirect back to order page if no cart data
-    header('Location: order.php');
+    header('Location: order-food.php');
     exit();
 }
 
@@ -119,31 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body class="order-page">
-    <!-- Header -->
-    <header class="header glass-effect">
-        <div class="container">
-            <a href="index.php" class="logo">
-                <i class="fas fa-utensils logo-icon"></i>
-                <span class="logo-text">Delicious<span class="highlight">Dispatchers</span></span>
-            </a>
-            <nav class="nav-menu" id="navMenu">
-                <a href="index.php" class="nav-link">Home</a>
-                <a href="order.php" class="nav-link">Order Now</a>
-                <a href="index.php#features" class="nav-link">Features</a>
-                <a href="index.php#pricing" class="nav-link">Pricing</a>
-                <a href="index.php#contact" class="nav-link">Contact</a>
-            </nav>
-            <div class="header-actions">
-                <a href="dashboard.php" class="btn btn-outline">Dashboard</a>
-                <a href="logout.php" class="btn btn-primary">Logout</a>
-            </div>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </header>
 
     <!-- Checkout Section -->
     <section class="checkout-section">
@@ -188,8 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
                             </p>
                         </div>
                         <div class="success-actions">
-                            <a href="dashboard.php" class="btn btn-primary">Track Order</a>
-                            <a href="order.php" class="btn btn-outline">Order More</a>
+                            <a href="user-dashboard.php" class="btn btn-primary">Track Order</a>
+                            <a href="order-food.php" class="btn btn-outline">Order More</a>
                         </div>
                     </div>
                     <?php else: ?>
@@ -290,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
                             <button type="button" class="btn btn-primary btn-lg" onclick="initiatePayment()">
                                 <i class="fas fa-lock"></i> Pay ₹<?php echo number_format($grand_total, 2); ?>
                             </button>
-                            <a href="order.php" class="btn btn-outline">Back to Menu</a>
+                            <a href="order-food.php" class="btn btn-outline">Back to Menu</a>
                         </div>
                     </form>
                     <?php endif; ?>

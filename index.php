@@ -1,7 +1,7 @@
 <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="home">
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text animate-fadeInLeft">
@@ -525,7 +525,7 @@
             .then(data => {
                 if (data.success) {
                     alert('Subscription activated successfully! Welcome to Delicious Dispatchers.');
-                    window.location.href = 'dashboard.php';
+                    window.location.href = 'user-dashboard.php';
                 } else {
                     alert(data.message || 'Payment verification failed');
                 }

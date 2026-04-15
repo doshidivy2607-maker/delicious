@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 // Check if user is admin
 $user_email = $_SESSION['user_email'];
 if ($user_email !== 'doshidivy2607@gmail.com') {
-    header('Location: dashboard.php');
+    header('Location: user-dashboard.php');
     exit();
 }
 

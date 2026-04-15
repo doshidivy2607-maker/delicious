@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 // Check if user is admin
 $user_email = $_SESSION['user_email'];
 if ($user_email !== 'doshidivy2607@gmail.com') {
-    header('Location: dashboard.php');
+    header('Location: user-dashboard.php');
     exit();
 }
 
@@ -143,7 +143,7 @@ foreach ($menu_items as $item) {
                 <span>Admin</span>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.php" class="nav-item" data-tooltip="User Dashboard">
+                <a href="user-dashboard.php" class="nav-item" data-tooltip="User Dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                 </a>
             </nav>

@@ -41,23 +41,17 @@ $total_spent = $order_stats['total_spent'];
                 <span>DD</span>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.php" class="nav-item active" data-tooltip="Dashboard">
+                <a href="#" class="nav-item active" data-tooltip="Dashboard">
                     <i class="fas fa-home"></i>
                 </a>
-                <?php if ($_SESSION['user_email'] === 'doshidivy2607@gmail.com'): ?>
-                <a href="admin.php" class="nav-item" data-tooltip="Admin Panel">
-                    <i class="fas fa-user-shield"></i>
-                </a>
-                <?php endif; ?>
-                <a href="order.php" class="nav-item" data-tooltip="Cart">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="nav-badge">12</span>
-                </a>
-                <a href="profile.php" class="nav-item" data-tooltip="My Profile">
+                <a href="user-profile.php" class="nav-item" data-tooltip="My Profile">
                     <i class="fas fa-users"></i>
                 </a>
-                <a href="order.php" class="nav-item" data-tooltip="Order Page">
+                <a href="order-food.php" class="nav-item" data-tooltip="Order Page">
                     <i class="fas fa-utensils"></i>
+                </a>
+                <a href="order-history.php" class="nav-item" data-tooltip="Order History">
+                    <i class="fas fa-history"></i>
                 </a>
             </nav>
         </aside>
@@ -113,7 +107,7 @@ $total_spent = $order_stats['total_spent'];
                 <div class="quick-actions glass-effect animate-fadeInUp">
                     <h3>Quick Actions</h3>
                     <div class="actions-grid">
-                        <a href="order.php" class="action-btn">
+                        <a href="order-food.php" class="action-btn">
                             <i class="fas fa-plus"></i>
                             <span>New Order</span>
                         </a>
@@ -124,7 +118,7 @@ $total_spent = $order_stats['total_spent'];
                 <div class="recent-orders glass-effect animate-fadeInUp">
                     <div class="section-header">
                         <h3>Order History</h3>
-                        <a href="order.php" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                        <a href="order-history.php" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <table class="orders-table">
                         <thead>

@@ -295,8 +295,8 @@ function initFilters() {
         document.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
         document.querySelector('.filter-option:first-child').classList.add('active');
         
-        if (priceRange) priceRange.value = 500;
-        document.getElementById('priceValue').textContent = '₹500';
+        if (priceRange) priceRange.value = 10000;
+        document.getElementById('priceValue').textContent = '₹10000';
         
         spiceOptions.forEach(opt => opt.checked = false);
         specialFilters.forEach(filter => filter.checked = false);
@@ -330,7 +330,7 @@ function initFilters() {
 function applyFilters() {
     const cards = document.querySelectorAll('.menu-card');
     const category = document.querySelector('.filter-option input:checked')?.value || 'all';
-    const maxPrice = parseInt(document.getElementById('priceRange')?.value || 500);
+    const maxPrice = parseInt(document.getElementById('priceRange')?.value || 10000);
     const spiceLevels = Array.from(document.querySelectorAll('.spice-option input:checked')).map(i => i.value);
     const bestseller = document.getElementById('bestsellerFilter')?.checked;
     const newItems = document.getElementById('newFilter')?.checked;
