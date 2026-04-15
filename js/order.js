@@ -1,6 +1,16 @@
 // ===== CART FUNCTIONALITY =====
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+// ===== UPDATE RESULTS COUNT =====
+function updateResultsCount() {
+    const visibleCards = document.querySelectorAll('.menu-card:not([style*="display: none"])');
+    const count = visibleCards.length;
+    const resultsElement = document.getElementById('resultsCount');
+    if (resultsElement) {
+        resultsElement.textContent = count;
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     updateCartUI();
@@ -8,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initSearch();
     initCartToggle();
     initImageErrorHandling();
+    initCart();
+    updateCartCount();
+    
+    // Set initial results count
+    updateResultsCount();
 });
 
 // ===== IMAGE ERROR HANDLING =====
@@ -392,7 +407,7 @@ function applyFilters() {
     sortedCards.forEach(card => menuGrid.appendChild(card));
     
     // Update count
-    document.getElementById('resultsCount').textContent = visibleCount;
+    updateResultsCount();
 }
 
 // ===== SEARCH =====
@@ -416,8 +431,7 @@ function initSearch() {
         });
         
         // Update count
-        const visibleCount = document.querySelectorAll('.menu-card:not([style*="display: none"])').length;
-        document.getElementById('resultsCount').textContent = visibleCount;
+        updateResultsCount();
     });
 }
 

@@ -1,11 +1,18 @@
 <?php
 include 'includes/db_config.php';
+include 'includes/menu-config.php';
 
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['user_id']);
 
+// Get category filter
+$active_category = isset($_GET['category']) ? $_GET['category'] : 'all';
+
+// Get filter counts dynamically
+$filter_counts = MenuConfig::getFilterCounts();
+
 // Fetch menu items from database
-$stmt = $pdo->prepare('SELECT * FROM menu ORDER BY category, name');
+$stmt = $pdo->prepare("SELECT * FROM menu ORDER BY category, name");
 $stmt->execute();
 $menu_items_db = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -141,31 +148,31 @@ $active_category = isset($_GET['category']) ? $_GET['category'] : 'all';
                                         <input type="radio" name="category" value="all" <?php echo $active_category == 'all' ? 'checked' : ''; ?>>
                                         <span class="filter-icon"><i class="fas fa-th-large"></i></span>
                                         <span class="filter-label">All Items</span>
-                                        <span class="filter-count">16</span>
+                                        <span class="filter-count"><?php echo $filter_counts['all']; ?></span>
                                     </label>
                                     <label class="filter-option <?php echo $active_category == 'veg' ? 'active' : ''; ?>">
                                         <input type="radio" name="category" value="veg" <?php echo $active_category == 'veg' ? 'checked' : ''; ?>>
                                         <span class="filter-icon veg"><i class="fas fa-leaf"></i></span>
                                         <span class="filter-label">Vegetarian</span>
-                                        <span class="filter-count">4</span>
+                                        <span class="filter-count"><?php echo $filter_counts['veg']; ?></span>
                                     </label>
                                     <label class="filter-option <?php echo $active_category == 'nonveg' ? 'active' : ''; ?>">
                                         <input type="radio" name="category" value="nonveg" <?php echo $active_category == 'nonveg' ? 'checked' : ''; ?>>
                                         <span class="filter-icon nonveg"><i class="fas fa-drumstick-bite"></i></span>
                                         <span class="filter-label">Non-Vegetarian</span>
-                                        <span class="filter-count">4</span>
+                                        <span class="filter-count"><?php echo $filter_counts['nonveg']; ?></span>
                                     </label>
                                     <label class="filter-option <?php echo $active_category == 'diet' ? 'active' : ''; ?>">
                                         <input type="radio" name="category" value="diet" <?php echo $active_category == 'diet' ? 'checked' : ''; ?>>
                                         <span class="filter-icon diet"><i class="fas fa-heartbeat"></i></span>
                                         <span class="filter-label">Diet & Healthy</span>
-                                        <span class="filter-count">4</span>
+                                        <span class="filter-count"><?php echo $filter_counts['diet']; ?></span>
                                     </label>
                                     <label class="filter-option <?php echo $active_category == 'subscription' ? 'active' : ''; ?>">
                                         <input type="radio" name="category" value="subscription" <?php echo $active_category == 'subscription' ? 'checked' : ''; ?>>
                                         <span class="filter-icon subscription"><i class="fas fa-calendar-check"></i></span>
                                         <span class="filter-label">Subscriptions</span>
-                                        <span class="filter-count">4</span>
+                                        <span class="filter-count"><?php echo $filter_counts['subscription']; ?></span>
                                     </label>
                                 </div>
                             </div>
@@ -260,7 +267,7 @@ $active_category = isset($_GET['category']) ? $_GET['category'] : 'all';
                     <!-- Sort Options -->
                     <div class="sort-bar glass-effect">
                         <div class="results-count">
-                            <span id="resultsCount">16</span> items found
+                            <span id="resultsCount"><?php echo count($menu_items); ?></span> items found
                         </div>
                         <div class="sort-options">
                             <label>Sort by:</label>
