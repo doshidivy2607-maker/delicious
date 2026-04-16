@@ -197,6 +197,7 @@ function formatOrderItems($items_json) {
                         <tr>
                             <th>Order ID</th>
                             <th>Customer</th>
+                            <th>Email</th>
                             <th>Items</th>
                             <th>Total Amount</th>
                             <th>Status</th>
@@ -211,11 +212,10 @@ function formatOrderItems($items_json) {
                             <td>#<?php echo $order['id']; ?></td>
                             <td>
                                 <div class="customer-info">
-                                    <span class="avatar"><?php echo strtoupper(substr($order['fullname'] ?? 'G', 0, 2)); ?></span>
-                                    <span><?php echo htmlspecialchars($order['fullname'] ?? 'Guest'); ?></span>
-                                    <br><small><?php echo htmlspecialchars($order['email'] ?? 'N/A'); ?></small>
+                                    <span class="avatar"><?php echo htmlspecialchars($order['fullname'] ?? 'Guest'); ?></span>
                                 </div>
                             </td>
+                            <td><?php echo htmlspecialchars($order['email'] ?? 'N/A'); ?></td>
                             <td><?php echo formatOrderItems($order['items']); ?></td>
                             <td>₹<?php echo number_format($order['total_amount'], 2); ?></td>
                             <td>
@@ -307,75 +307,93 @@ function formatOrderItems($items_json) {
         }
     </style>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Export orders PDF
+        // Export orders Excel
         document.addEventListener('DOMContentLoaded', function() {
             const exportBtn = document.getElementById('exportOrdersBtn');
             if (exportBtn) {
-                exportBtn.addEventListener('click', async function() {
-                    const source = document.getElementById('ordersTableContainer');
-                    if (!source) return;
-
-                    const jsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : null;
-                    if (!jsPDF) {
-                        alert('PDF export is currently unavailable.');
-                        return;
-                    }
-
+                exportBtn.addEventListener('click', function() {
                     try {
-                        const canvas = await html2canvas(source, {
-                            scale: 2,
-                            useCORS: true,
-                            backgroundColor: '#ffffff',
-                            logging: false
+                        // Get the table data
+                        const table = document.querySelector('#ordersTableContainer table');
+                        if (!table) {
+                            alert('Orders table not found.');
+                            return;
+                        }
+
+                        // Extract data from table
+                        const rows = table.querySelectorAll('tr');
+                        const data = [];
+
+                        // Add headers
+                        const headers = [];
+                        const headerCells = rows[0].querySelectorAll('th');
+                        headerCells.forEach((cell, index) => {
+                            if (index < 8) { // Skip Actions column
+                                headers.push(cell.textContent.trim());
+                            }
                         });
+                        data.push(headers);
 
-                        const imgData = canvas.toDataURL('image/png');
-                        const pdf = new jsPDF('p', 'pt', 'a4');
-                        const pageWidth = pdf.internal.pageSize.getWidth();
-                        const pageHeight = pdf.internal.pageSize.getHeight();
-                        const imgProps = pdf.getImageProperties(imgData);
-                        const pdfWidth = pageWidth - 30;
-                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                        let position = 15;
-
-                        if (pdfHeight <= pageHeight - 30) {
-                            pdf.addImage(imgData, 'PNG', 15, position, pdfWidth, pdfHeight);
-                        } else {
-                            let heightLeft = pdfHeight;
-                            let srcHeight = canvas.height;
-                            const ratio = imgProps.width / pdfWidth;
-                            const pageCanvas = document.createElement('canvas');
-                            const pageContext = pageCanvas.getContext('2d');
-                            pageCanvas.width = canvas.width;
-                            pageCanvas.height = Math.floor((pageHeight - 30) * ratio);
-
-                            let yOffset = 0;
-                            while (heightLeft > 0) {
-                                pageContext.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
-                                pageContext.drawImage(canvas, 0, yOffset, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
-                                const pageData = pageCanvas.toDataURL('image/png');
-                                pdf.addImage(pageData, 'PNG', 15, 15, pdfWidth, (pageCanvas.height / ratio));
-                                heightLeft -= (pageHeight - 30);
-                                yOffset += pageCanvas.height;
-                                if (heightLeft > 0) {
-                                    pdf.addPage();
+                        // Add data rows
+                        for (let i = 1; i < rows.length; i++) {
+                            const row = rows[i];
+                            const rowData = [];
+                            const cells = row.querySelectorAll('td');
+                            
+                            cells.forEach((cell, index) => {
+                                if (index < 9) { // Include Email column
+                                    let cellText = cell.textContent.trim();
+                                    
+                                    // Clean up status badges
+                                    if (cellText.includes('Confirmed') || cellText.includes('Preparing') || 
+                                        cellText.includes('Ready') || cellText.includes('Completed') || 
+                                        cellText.includes('Cancelled')) {
+                                        cellText = cellText.replace(/\s+/g, ' ').trim();
+                                    }
+                                    
+                                    rowData.push(cellText);
                                 }
+                            });
+                            
+                            if (rowData.length > 0) {
+                                data.push(rowData);
                             }
                         }
 
-                        const filename = 'orders-export-' + new Date().toISOString().slice(0,10) + '.pdf';
-                        pdf.save(filename);
+                        // Create workbook
+                        const ws = XLSX.utils.aoa_to_sheet(data);
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, "Orders");
+
+                        // Auto-size columns
+                        const colWidths = [];
+                        data.forEach((row, rowIndex) => {
+                            row.forEach((cell, colIndex) => {
+                                const cellLength = cell.toString().length;
+                                if (!colWidths[colIndex] || cellLength > colWidths[colIndex]) {
+                                    colWidths[colIndex] = cellLength + 2;
+                                }
+                            });
+                        });
+                        
+                        ws['!cols'] = colWidths.map(width => ({ width: Math.min(width, 30) }));
+
+                        // Generate filename with current date
+                        const today = new Date().toISOString().slice(0, 10);
+                        const filename = `orders-export-${today}.xlsx`;
+
+                        // Download the Excel file
+                        XLSX.writeFile(wb, filename);
+                        
+                        console.log('Excel export completed successfully');
                     } catch (error) {
-                        console.error('PDF export error:', error);
-                        alert('Unable to export orders to PDF. Please try again.');
+                        console.error('Excel export error:', error);
+                        alert('Unable to export orders to Excel. Please try again.');
                     }
                 });
-            }
-
-            // Context menu functionality
+            }      // Context menu functionality
             let currentOrderId = null;
             const contextMenu = document.getElementById('contextMenu');
             const orderActions = document.querySelectorAll('.order-actions');
