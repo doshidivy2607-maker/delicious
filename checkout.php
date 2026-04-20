@@ -28,11 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['cart_data'])) {
     exit();
 }
 
-// Calculate totals
-$subtotal = $total_amount;
-$delivery_fee = $subtotal > 300 ? 0 : 40; // Free delivery above ₹300
-$tax = $subtotal * 0.05; // 5% GST
-$grand_total = $subtotal + $delivery_fee + $tax;
+// Calculate totals with proper rounding to avoid floating point precision issues
+$subtotal = round($total_amount, 2);
+$delivery_fee = $subtotal > 300 ? 0 : 40; // Free delivery above Rs.300
+$tax = round($subtotal * 0.05, 2); // 5% GST with proper rounding
+$grand_total = round($subtotal + $delivery_fee + $tax, 2); // Final total with proper rounding
 
 // Get user details
 $user_id = $_SESSION['user_id'];
@@ -323,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
         // Razorpay Configuration
         const razorpayConfig = {
             key: ENV.RAZORPAY.KEY_ID, 
-            amount: <?php echo $grand_total * 100; ?>, // Amount in paisa
+            amount: <?php echo round($grand_total * 100); ?>, // Amount in paisa with proper rounding
             currency: 'INR',
             name: 'Delicious Dispatchers',
             description: 'Food Order Payment',
