@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_name = $_SESSION['user_name'];
 $user_id = $_SESSION['user_id'];
+$user_email = $_SESSION['user_email'];
 
 // Get user order statistics
 $order_stats_stmt = $pdo->prepare("SELECT COUNT(*) AS order_count, COALESCE(SUM(total_amount), 0) AS total_spent FROM orders WHERE user_id = ?");
@@ -53,6 +54,11 @@ $total_spent = $order_stats['total_spent'];
                 <a href="order-history.php" class="nav-item" data-tooltip="Order History">
                     <i class="fas fa-history"></i>
                 </a>
+                <?php if ($user_email === 'doshidivy2607@gmail.com'): ?>
+                <a href="users.php" class="nav-item admin-only" data-tooltip="user dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <?php endif; ?>
             </nav>
         </aside>
 
